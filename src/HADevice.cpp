@@ -68,6 +68,11 @@ void HADevice::setModel(const char* model)
     _serializer->set(AHATOFSTR(HADeviceModelProperty), model);
 }
 
+void HADevice::setURL(const char* url)
+{
+    _serializer->set(AHATOFSTR(HAIPProperty), url);
+}
+
 void HADevice::setName(const char* name)
 {
     _serializer->set(AHATOFSTR(HANameProperty), name);

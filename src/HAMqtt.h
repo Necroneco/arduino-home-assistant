@@ -137,7 +137,8 @@ public:
         const IPAddress serverIp,
         const uint16_t serverPort = HAMQTT_DEFAULT_PORT,
         const char* username = nullptr,
-        const char* password = nullptr
+        const char* password = nullptr,
+        const char* clientID = nullptr
     );
 
     /**
@@ -152,7 +153,8 @@ public:
     bool begin(
         const IPAddress serverIp,
         const char* username,
-        const char* password
+        const char* password,
+        const char* clientID
     );
 
     /**
@@ -169,7 +171,8 @@ public:
         const char* serverHostname,
         const uint16_t serverPort = HAMQTT_DEFAULT_PORT,
         const char* username = nullptr,
-        const char* password = nullptr
+        const char* password = nullptr,
+        const char* clientID = nullptr
     );
 
     /**
@@ -184,13 +187,16 @@ public:
     bool begin(
         const char* serverHostname,
         const char* username,
-        const char* password
+        const char* password,
+        const char* clientID
     );
 
     /**
      * Closes the MQTT connection.
      */
     bool disconnect();
+
+    void disableHA();
 
     /**
      * This method should be called periodically inside the main loop of the firmware.
@@ -331,6 +337,8 @@ private:
      */
     void connectToServer();
 
+    bool noHA = false;
+
     /**
      * This method is called each time the connection with MQTT broker is acquired.
      */
@@ -363,6 +371,9 @@ private:
 
     /// The username used for the authentication. It's set in the HAMqtt::begin method.
     const char* _username;
+
+    /// The username used for the authentication. It's set in the HAMqtt::begin method.
+    const char* _clientID;
 
     /// The password used for the authentication. It's set in the HAMqtt::begin method.
     const char* _password;

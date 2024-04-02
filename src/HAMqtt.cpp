@@ -26,7 +26,7 @@
     _lastWillRetain(false)
 
 static const char* DefaultDiscoveryPrefix = "homeassistant";
-static const char* DefaultDataPrefix = "aha";
+static const char* DefaultDataPrefix = "SHA";
 
 HAMqtt* HAMqtt::_instance = nullptr;
 
@@ -78,7 +78,8 @@ bool HAMqtt::begin(
     const IPAddress serverIp,
     const uint16_t serverPort,
     const char* username,
-    const char* password
+    const char* password,
+    const char* clientID
 )
 {
     ARDUINOHA_DEBUG_PRINT(F("AHA: init server "))
@@ -86,10 +87,10 @@ bool HAMqtt::begin(
     ARDUINOHA_DEBUG_PRINT(F(":"))
     ARDUINOHA_DEBUG_PRINTLN(serverPort)
 
-    if (_device.getUniqueId() == nullptr) {
-        ARDUINOHA_DEBUG_PRINTLN(F("AHA: init failed. Missing device unique ID"))
-        return false;
-    }
+    // if (_device.getUniqueId() == nullptr) {
+    //     ARDUINOHA_DEBUG_PRINTLN(F("AHA: init failed. Missing device unique ID"))
+    //     return false;
+    // }
 
     if (_initialized) {
         ARDUINOHA_DEBUG_PRINTLN(F("AHA: already initialized"))
@@ -99,7 +100,7 @@ bool HAMqtt::begin(
     _username = username;
     _password = password;
     _initialized = true;
-
+    _clientID = clientID;
     _mqtt->setServer(serverIp, serverPort);
     _mqtt->setCallback(onMessageReceived);
 
@@ -109,17 +110,19 @@ bool HAMqtt::begin(
 bool HAMqtt::begin(
     const IPAddress serverIp,
     const char* username,
-    const char* password
+    const char* password,
+    const char* userid
 )
 {
-    return begin(serverIp, HAMQTT_DEFAULT_PORT, username, password);
+    return begin(serverIp, HAMQTT_DEFAULT_PORT, username, password, userid);
 }
 
 bool HAMqtt::begin(
     const char* serverHostname,
     const uint16_t serverPort,
     const char* username,
-    const char* password
+    const char* password,
+    const char* clientID
 )
 {
     ARDUINOHA_DEBUG_PRINT(F("AHA: init server "))
@@ -127,10 +130,10 @@ bool HAMqtt::begin(
     ARDUINOHA_DEBUG_PRINT(F(":"))
     ARDUINOHA_DEBUG_PRINTLN(serverPort)
 
-    if (_device.getUniqueId() == nullptr) {
-        ARDUINOHA_DEBUG_PRINTLN(F("AHA: init failed. Missing device unique ID"))
-        return false;
-    }
+    // if (_device.getUniqueId() == nullptr) {
+    //     ARDUINOHA_DEBUG_PRINTLN(F("AHA: init failed. Missing device unique ID"))
+    //     return false;
+    // }
 
     if (_initialized) {
         ARDUINOHA_DEBUG_PRINTLN(F("AHA: already initialized"))
@@ -140,6 +143,7 @@ bool HAMqtt::begin(
     _username = username;
     _password = password;
     _initialized = true;
+    _clientID = clientID;
 
     _mqtt->setServer(serverHostname, serverPort);
     _mqtt->setCallback(onMessageReceived);
@@ -150,10 +154,11 @@ bool HAMqtt::begin(
 bool HAMqtt::begin(
     const char* serverHostname,
     const char* username,
-    const char* password
+    const char* password,
+    const char* userid
 )
 {
-    return begin(serverHostname, HAMQTT_DEFAULT_PORT, username, password);
+    return begin(serverHostname, HAMQTT_DEFAULT_PORT, username, password, userid);
 }
 
 bool HAMqtt::disconnect()
@@ -169,6 +174,11 @@ bool HAMqtt::disconnect()
     _mqtt->disconnect();
 
     return true;
+}
+
+void HAMqtt::disableHA()
+{
+    noHA = true;
 }
 
 void HAMqtt::loop()
@@ -261,6 +271,8 @@ void HAMqtt::processMessage(const char* topic, const uint8_t* payload, uint16_t 
         _messageCallback(topic, payload, length);
     }
 
+    if (noHA) return;
+
     for (uint8_t i = 0; i < _devicesTypesNb; i++) {
         _devicesTypes[i]->onMqttMessage(topic, payload, length);
     }
@@ -275,11 +287,11 @@ void HAMqtt::connectToServer()
 
     _lastConnectionAttemptAt = millis();
 
-    ARDUINOHA_DEBUG_PRINT(F("AHA: connecting, client ID: "))
-    ARDUINOHA_DEBUG_PRINTLN(_device.getUniqueId())
+//    ARDUINOHA_DEBUG_PRINT(F("AHA: connecting, client ID: "))
+//    ARDUINOHA_DEBUG_PRINTLN(_device.getUniqueId())
 
     _mqtt->connect(
-        _device.getUniqueId(),
+        _clientID, // _device.getUniqueId(),
         _username,
         _password,
         _lastWillTopic,
@@ -302,6 +314,8 @@ void HAMqtt::onConnectedLogic()
     if (_connectedCallback) {
         _connectedCallback();
     }
+
+    if (noHA) return;
 
     _device.publishAvailability();
 
