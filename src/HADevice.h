@@ -110,6 +110,8 @@ public:
      */
     void setModel(const char* model);
 
+    void setURL(const char* url);
+
     /**
      * Sets the "name" property that's going to be displayed in the Home Assistant.
      *
