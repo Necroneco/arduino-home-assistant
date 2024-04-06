@@ -8,6 +8,7 @@ HASelect::HASelect(const char* uniqueId) :
     HABaseDeviceType(AHATOFSTR(HAComponentSelect), uniqueId),
     _options(nullptr),
     _currentState(-1),
+    _entityCategory(nullptr),
     _icon(nullptr),
     _retain(false),
     _optimistic(false),
@@ -96,10 +97,11 @@ void HASelect::buildSerializer()
         return;
     }
 
-    _serializer = new HASerializer(this, 11); // 11 - max properties nb
+    _serializer = new HASerializer(this, 12); // 12 - max properties nb
     _serializer->set(AHATOFSTR(HANameProperty), _name);
     _serializer->set(AHATOFSTR(HAObjectIdProperty), _objectId);
     _serializer->set(HASerializer::WithUniqueId);
+    _serializer->set(AHATOFSTR(HAStateEntityCategory), _entityCategory);
     _serializer->set(AHATOFSTR(HAIconProperty), _icon);
     _serializer->set(
         AHATOFSTR(HAOptionsProperty),
