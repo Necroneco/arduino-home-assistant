@@ -48,6 +48,7 @@ void HALight::RGBColor::fromBuffer(const uint8_t* data, const uint16_t length)
 HALight::HALight(const char* uniqueId, const uint8_t features) :
     HABaseDeviceType(AHATOFSTR(HAComponentLight), uniqueId),
     _features(features),
+    _entityCategory(nullptr),
     _icon(nullptr),
     _retain(false),
     _optimistic(false),
@@ -128,10 +129,11 @@ void HALight::buildSerializer()
         return;
     }
 
-    _serializer = new HASerializer(this, 19); // 19 - max properties nb
+    _serializer = new HASerializer(this, 20); // 20 - max properties nb
     _serializer->set(AHATOFSTR(HANameProperty), _name);
     _serializer->set(AHATOFSTR(HAObjectIdProperty), _objectId);
     _serializer->set(HASerializer::WithUniqueId);
+    _serializer->set(AHATOFSTR(HAStateEntityCategory), _entityCategory);
     _serializer->set(AHATOFSTR(HAIconProperty), _icon);
 
     if (_retain) {

@@ -203,6 +203,15 @@ public:
         { return _currentRGBColor; }
 
     /**
+     * Sets the entity category for the sensor.
+     * See: https://www.home-assistant.io/integrations/sensor.mqtt/#entity_category
+     *
+     * @param entityCategory The category name.
+     */
+    inline void setEntityCategory(const char* entityCategory)
+        { _entityCategory = entityCategory; }
+
+    /**
      * Sets icon of the light.
      * Any icon from MaterialDesignIcons.com (for example: `mdi:home`).
      *
@@ -373,6 +382,9 @@ private:
 
     /// Features enabled for the light.
     const uint8_t _features;
+
+    /// The entity category for the sensor. It can be nullptr. See: https://www.home-assistant.io/integrations/sensor.mqtt/#entity_category
+    const char* _entityCategory;
 
     /// The icon of the button. It can be nullptr.
     const char* _icon;
