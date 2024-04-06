@@ -7,6 +7,7 @@
 HASwitch::HASwitch(const char* uniqueId) :
     HABaseDeviceType(AHATOFSTR(HAComponentSwitch), uniqueId),
     _class(nullptr),
+    _entityCategory(nullptr),
     _icon(nullptr),
     _retain(false),
     _optimistic(false),
@@ -36,11 +37,12 @@ void HASwitch::buildSerializer()
         return;
     }
 
-    _serializer = new HASerializer(this, 11); // 11 - max properties nb
+    _serializer = new HASerializer(this, 12); // 12 - max properties nb
     _serializer->set(AHATOFSTR(HANameProperty), _name);
     _serializer->set(AHATOFSTR(HAObjectIdProperty), _objectId);
     _serializer->set(HASerializer::WithUniqueId);
     _serializer->set(AHATOFSTR(HADeviceClassProperty), _class);
+    _serializer->set(AHATOFSTR(HAStateEntityCategory), _entityCategory);
     _serializer->set(AHATOFSTR(HAIconProperty), _icon);
 
     // optional property
